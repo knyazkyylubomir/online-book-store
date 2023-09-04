@@ -1,5 +1,6 @@
 package org.project.name.online.book.store.repository;
 
+import java.util.List;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -7,7 +8,6 @@ import org.project.name.online.book.store.exception.DataProcessingException;
 import org.project.name.online.book.store.model.Book;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Repository;
-import java.util.List;
 
 @Repository
 public class BookRepositoryImpl implements BookRepository {
@@ -17,7 +17,6 @@ public class BookRepositoryImpl implements BookRepository {
     public BookRepositoryImpl(SessionFactory sessionFactory) {
         this.sessionFactory = sessionFactory;
     }
-
 
     @Override
     public Book save(Book book) {
