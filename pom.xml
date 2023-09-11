@@ -47,7 +47,19 @@
             <version>8.1.0</version>
         </dependency>
 
-        <dependency>
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-core</artifactId>
+			<version>${liquibase.version}</version>
+		</dependency>
+
+		<dependency>
+			<groupId>org.liquibase</groupId>
+			<artifactId>liquibase-maven-plugin</artifactId>
+			<version>${liquibase.version}</version>
+		</dependency>
+
+		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
 		</dependency>
@@ -104,6 +116,13 @@
 						</goals>
 					</execution>
 				</executions>
+				<dependencies>
+					<dependency>
+						<groupId>com.puppycrawl.tools</groupId>
+						<artifactId>checkstyle</artifactId>
+						<version>9.2</version>
+					</dependency>
+				</dependencies>
 				<configuration>
 					<configLocation>${maven.checkstyle.plugin.configLocation}</configLocation>
 					<encoding>UTF-8</encoding>
