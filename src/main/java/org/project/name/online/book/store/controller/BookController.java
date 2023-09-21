@@ -5,12 +5,13 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.project.name.online.book.store.dto.BookDto;
-import org.project.name.online.book.store.dto.BookSearchParameters;
-import org.project.name.online.book.store.dto.CreateBookRequestDto;
-import org.project.name.online.book.store.service.BookService;
+import org.project.name.online.book.store.dto.book.BookDto;
+import org.project.name.online.book.store.dto.book.BookSearchParameters;
+import org.project.name.online.book.store.dto.book.CreateBookRequestDto;
+import org.project.name.online.book.store.service.book.BookService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -43,12 +44,14 @@ public class BookController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Create a new book", description = "This endpoint creates a new book")
     public BookDto createBook(@RequestBody @Valid CreateBookRequestDto bookDto) {
         return bookService.save(bookDto);
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Update a book by id", description = "This endpoint updates a book by id")
     public BookDto updateBook(@PathVariable Long id,
                               @RequestBody @Valid CreateBookRequestDto bookDto) {
@@ -64,6 +67,7 @@ public class BookController {
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Delete a book by id", description = "This endpoint deletes book by id")
     public void deleteBook(@PathVariable Long id) {
         bookService.deleteById(id);

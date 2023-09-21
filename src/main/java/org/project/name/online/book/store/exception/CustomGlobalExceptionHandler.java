@@ -4,7 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.project.name.online.book.store.exception.body.ErrorRespondBody;
-import org.project.name.online.book.store.mapper.BookMapper;
+import org.project.name.online.book.store.mapper.book.BookMapper;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -42,6 +42,22 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         HttpStatus status = HttpStatus.NOT_FOUND;
         List<String> error = List.of(ex.getMessage());
         ErrorRespondBody body = bookMapper.createErrorBody(LocalDateTime.now(), status, error);
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(value = RegistrationException.class)
+    protected ResponseEntity<Object> handleRegistrationException(RegistrationException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        List<String> errors = List.of(ex.getMessage());
+        ErrorRespondBody body = bookMapper.createErrorBody(LocalDateTime.now(), status, errors);
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(value = DuplicateException.class)
+    protected ResponseEntity<Object> handleDuplicateException(DuplicateException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        List<String> errors = List.of(ex.getMessage());
+        ErrorRespondBody body = bookMapper.createErrorBody(LocalDateTime.now(), status, errors);
         return new ResponseEntity<>(body, status);
     }
 

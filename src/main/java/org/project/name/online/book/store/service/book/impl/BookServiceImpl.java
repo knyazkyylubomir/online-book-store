@@ -1,16 +1,17 @@
-package org.project.name.online.book.store.service.impl;
+package org.project.name.online.book.store.service.book.impl;
 
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.project.name.online.book.store.dto.BookDto;
-import org.project.name.online.book.store.dto.BookSearchParameters;
-import org.project.name.online.book.store.dto.CreateBookRequestDto;
+import org.project.name.online.book.store.dto.book.BookDto;
+import org.project.name.online.book.store.dto.book.BookSearchParameters;
+import org.project.name.online.book.store.dto.book.CreateBookRequestDto;
+import org.project.name.online.book.store.exception.DuplicateException;
 import org.project.name.online.book.store.exception.EntityNotFoundException;
-import org.project.name.online.book.store.mapper.BookMapper;
+import org.project.name.online.book.store.mapper.book.BookMapper;
 import org.project.name.online.book.store.model.Book;
 import org.project.name.online.book.store.repository.book.BookRepository;
 import org.project.name.online.book.store.repository.book.BookSpecificationBuilder;
-import org.project.name.online.book.store.service.BookService;
+import org.project.name.online.book.store.service.book.BookService;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto save(CreateBookRequestDto bookDto) {
+        checkIfIsbnIsDuplicate(bookDto.getIsbn());
         Book book = bookMapper.toModel(bookDto);
         return bookMapper.toDto(bookRepository.save(book));
     }
@@ -32,8 +34,7 @@ public class BookServiceImpl implements BookService {
     public BookDto getBookById(Long id) {
         return bookRepository.findById(id)
                 .map(bookMapper::toDto)
-                .orElseThrow(() -> new EntityNotFoundException(
-                        "There are no book by id: " + id));
+                .orElseThrow(() -> new EntityNotFoundException("There is no book by id: " + id));
     }
 
     @Override
@@ -45,8 +46,9 @@ public class BookServiceImpl implements BookService {
 
     @Override
     public BookDto updateBookById(Long id, CreateBookRequestDto bookDto) {
+        checkIfIsbnIsDuplicate(bookDto.getIsbn());
         Book bookById = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
-                "There are no book by id: " + id));
+                "There is no book by id: " + id));
         Book book = bookMapper.mergeEntities(bookDto, bookRepository.save(bookById));
         return bookMapper.toDto(bookRepository.save(book));
     }
@@ -62,5 +64,11 @@ public class BookServiceImpl implements BookService {
     @Override
     public void deleteById(Long id) {
         bookRepository.deleteById(id);
+    }
+
+    private void checkIfIsbnIsDuplicate(String isbn) {
+        if (bookRepository.findByIsbn(isbn).isPresent()) {
+            throw new DuplicateException("This isbn is already registered in the data base");
+        }
     }
 }

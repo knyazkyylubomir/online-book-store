@@ -1,7 +1,7 @@
 package org.project.name.online.book.store.repository.book;
 
 import lombok.RequiredArgsConstructor;
-import org.project.name.online.book.store.dto.BookSearchParameters;
+import org.project.name.online.book.store.dto.book.BookSearchParameters;
 import org.project.name.online.book.store.model.Book;
 import org.project.name.online.book.store.repository.SpecificationBuilder;
 import org.project.name.online.book.store.repository.SpecificationProviderManager;

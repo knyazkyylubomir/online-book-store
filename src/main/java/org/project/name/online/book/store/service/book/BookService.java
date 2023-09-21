@@ -1,9 +1,9 @@
-package org.project.name.online.book.store.service;
+package org.project.name.online.book.store.service.book;
 
 import java.util.List;
-import org.project.name.online.book.store.dto.BookDto;
-import org.project.name.online.book.store.dto.BookSearchParameters;
-import org.project.name.online.book.store.dto.CreateBookRequestDto;
+import org.project.name.online.book.store.dto.book.BookDto;
+import org.project.name.online.book.store.dto.book.BookSearchParameters;
+import org.project.name.online.book.store.dto.book.CreateBookRequestDto;
 import org.springframework.data.domain.Pageable;
 
 public interface BookService {
