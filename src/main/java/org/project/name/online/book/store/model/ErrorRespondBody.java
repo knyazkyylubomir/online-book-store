@@ -1,4 +1,4 @@
-package org.project.name.online.book.store.exception.body;
+package org.project.name.online.book.store.model;
 
 import java.time.LocalDateTime;
 import java.util.List;
