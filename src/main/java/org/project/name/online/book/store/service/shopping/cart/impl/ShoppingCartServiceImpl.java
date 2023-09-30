@@ -32,11 +32,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void save(String email, CreateCartItemRequestDto cartItemDto) {
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new EntityNotFoundException("There is no user by email: " + email));
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId()).orElseThrow(
-                () -> new EntityNotFoundException(
-                        "There is no shopping cart by user id: " + user.getId()));
+        ShoppingCart shoppingCart = getShoppingCartByEmail(email);
         List<CartItem> cartItems = cartItemRepository.findAllByShoppingCartId(shoppingCart.getId());
         for (CartItem cartItem : cartItems) {
             if (cartItem.getBook().getId().equals(cartItemDto.getBookId())) {
@@ -54,11 +50,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public ShoppingCartDto getCartByUserId(String email, Pageable pageable) {
-        User user = userRepository.findByEmail(email).orElseThrow(
-                        () -> new EntityNotFoundException("There is no user by email: " + email));
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId()).orElseThrow(
-                        () -> new EntityNotFoundException(
-                                "There is no shopping cart by user id: " + user.getId()));
+        ShoppingCart shoppingCart = getShoppingCartByEmail(email);
         List<CartItem> cartItems
                 = cartItemRepository.findAllByShoppingCartId(shoppingCart.getId(), pageable);
         return shoppingCartMapper.toDto(shoppingCart, cartItemMapper.toDtoList(cartItems));
@@ -66,11 +58,7 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
 
     @Override
     public void update(String email, Long cartItemId, UpdateCartItemRequestDto cartItemDto) {
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new EntityNotFoundException("There is no user by email: " + email));
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId()).orElseThrow(
-                () -> new EntityNotFoundException(
-                        "There is no shopping cart by user id: " + user.getId()));
+        ShoppingCart shoppingCart = getShoppingCartByEmail(email);
         List<CartItem> cartItems = cartItemRepository.findAllByShoppingCartId(shoppingCart.getId());
         cartItems.stream()
                 .filter(cartItem -> cartItem.getId().equals(cartItemId))
@@ -87,14 +75,18 @@ public class ShoppingCartServiceImpl implements ShoppingCartService {
     public void delete(String email, Long cartItemId) {
         cartItemRepository.findById(cartItemId).orElseThrow(
                 () -> new EntityNotFoundException("There is no cart-item by id: " + cartItemId));
-        User user = userRepository.findByEmail(email).orElseThrow(
-                () -> new EntityNotFoundException("There is no user by email: " + email));
-        ShoppingCart shoppingCart = shoppingCartRepository.findByUserId(user.getId()).orElseThrow(
-                () -> new EntityNotFoundException(
-                        "There is no shopping cart by user id: " + user.getId()));
+        ShoppingCart shoppingCart = getShoppingCartByEmail(email);
         List<CartItem> cartItems = cartItemRepository.findAllByShoppingCartId(shoppingCart.getId());
         cartItems.stream()
                 .filter(cartItem -> cartItem.getId().equals(cartItemId))
                 .forEach(cartItemRepository::delete);
+    }
+
+    private ShoppingCart getShoppingCartByEmail(String email) {
+        User user = userRepository.findByEmail(email).orElseThrow(
+                () -> new EntityNotFoundException("There is no user by email: " + email));
+        return shoppingCartRepository.findByUserId(user.getId()).orElseThrow(
+                () -> new EntityNotFoundException(
+                        "There is no shopping cart by user id: " + user.getId()));
     }
 }
