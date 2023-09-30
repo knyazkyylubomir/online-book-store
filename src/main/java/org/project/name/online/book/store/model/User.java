@@ -8,9 +8,12 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
+import jakarta.persistence.NamedAttributeNode;
+import jakarta.persistence.NamedEntityGraph;
 import jakarta.persistence.Table;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import lombok.Data;
@@ -22,7 +25,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 @Data
 @Entity
-@SQLDelete(sql = "UPDATE books SET is_deleted = true WHERE id = ?")
+@NamedEntityGraph(name = "User.roles",
+        attributeNodes = @NamedAttributeNode("roles"))
+@SQLDelete(sql = "UPDATE users SET is_deleted = true WHERE id = ?")
 @Where(clause = "is_deleted = false")
 @Table(name = "users")
 public class User implements UserDetails {
@@ -43,7 +48,7 @@ public class User implements UserDetails {
     @JoinTable(name = "users_roles",
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "role_id"))
-    private Set<Role> roles;
+    private Set<Role> roles = new HashSet<>();
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted = false;
 

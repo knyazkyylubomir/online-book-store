@@ -36,7 +36,7 @@ public class UserServiceImpl implements UserService {
         String shippingAddress = request.getShippingAddress();
         Role.RoleName roleName = Role.RoleName.ROLE_USER;
         Role role = roleRepository.findByRoleName(roleName).orElseThrow(
-                () -> new EntityNotFoundException("There is no a role name: " + roleName));
+                () -> new EntityNotFoundException("There is no role name: " + roleName));
         Set<Role> roles = Set.of(role);
         User user = userMapper.createUser(email, encodedPassword,
                 firstName, lastName, shippingAddress, roles);

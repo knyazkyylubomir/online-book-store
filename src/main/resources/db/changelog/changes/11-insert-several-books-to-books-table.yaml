@@ -1,0 +1,80 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-several-books-to-books-table
+      author: liubomyr
+      changes:
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Ivanhoe"
+              - column:
+                  name: author
+                  value: "W. Scott"
+              - column:
+                  name: isbn
+                  value: "978-617-07-0735-2"
+              - column:
+                  name: price
+                  value: "281.99"
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "One Hundred Years of Solitude"
+              - column:
+                  name: author
+                  value: "G. Marquez"
+              - column:
+                  name: isbn
+                  value: "9780241968581"
+              - column:
+                  name: price
+                  value: "570.99"
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Harry Potter and the Philosopher's Stone"
+              - column:
+                  name: author
+                  value: "J. K. Rowling"
+              - column:
+                  name: isbn
+                  value: "9781408855898"
+              - column:
+                  name: price
+                  value: "951.99"
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Harry Potter and the Order of the Phoenix"
+              - column:
+                  name: author
+                  value: "J. K. Rowling"
+              - column:
+                  name: isbn
+                  value: "978-0-7475-6960-2"
+              - column:
+                  name: price
+                  value: "2537.99"
+        - insert:
+            tableName: books
+            columns:
+              - column:
+                  name: title
+                  value: "Depeche Mode"
+              - column:
+                  name: author
+                  value: "S. Zhadan"
+              - column:
+                  name: isbn
+                  value: "1909156841"
+              - column:
+                  name: price
+                  value: "26.99"

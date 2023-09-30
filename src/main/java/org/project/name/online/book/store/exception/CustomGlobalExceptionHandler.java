@@ -1,10 +1,11 @@
 package org.project.name.online.book.store.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
-import org.project.name.online.book.store.exception.body.ErrorRespondBody;
-import org.project.name.online.book.store.mapper.book.BookMapper;
+import org.project.name.online.book.store.mapper.error.respond.body.ErrorRespondBodyMapper;
+import org.project.name.online.book.store.model.ErrorRespondBody;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
@@ -20,7 +21,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @RequiredArgsConstructor
 @ControllerAdvice
 public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler {
-    private final BookMapper bookMapper;
+    private final ErrorRespondBodyMapper errorRespondBodyMapper;
 
     @Override
     protected ResponseEntity<Object> handleMethodArgumentNotValid(
@@ -33,7 +34,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         List<String> errors = ex.getBindingResult().getAllErrors().stream()
                 .map(this::getErrorMessage)
                 .toList();
-        ErrorRespondBody body = bookMapper.createErrorBody(LocalDateTime.now(), status, errors);
+        ErrorRespondBody body = errorRespondBodyMapper.createErrorBody(
+                LocalDateTime.now(), status, errors);
         return new ResponseEntity<>(body, headers, statusCode);
     }
 
@@ -41,7 +43,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<Object> handleEntityNotFoundException(EntityNotFoundException ex) {
         HttpStatus status = HttpStatus.NOT_FOUND;
         List<String> error = List.of(ex.getMessage());
-        ErrorRespondBody body = bookMapper.createErrorBody(LocalDateTime.now(), status, error);
+        ErrorRespondBody body = errorRespondBodyMapper.createErrorBody(
+                LocalDateTime.now(), status, error);
         return new ResponseEntity<>(body, status);
     }
 
@@ -49,7 +52,8 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<Object> handleRegistrationException(RegistrationException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         List<String> errors = List.of(ex.getMessage());
-        ErrorRespondBody body = bookMapper.createErrorBody(LocalDateTime.now(), status, errors);
+        ErrorRespondBody body = errorRespondBodyMapper.createErrorBody(
+                LocalDateTime.now(), status, errors);
         return new ResponseEntity<>(body, status);
     }
 
@@ -57,7 +61,17 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     protected ResponseEntity<Object> handleDuplicateException(DuplicateException ex) {
         HttpStatus status = HttpStatus.BAD_REQUEST;
         List<String> errors = List.of(ex.getMessage());
-        ErrorRespondBody body = bookMapper.createErrorBody(LocalDateTime.now(), status, errors);
+        ErrorRespondBody body = errorRespondBodyMapper.createErrorBody(
+                LocalDateTime.now(), status, errors);
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(value = ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolationException() {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        List<String> errors = List.of("Id must be greater than or equal to 1");
+        ErrorRespondBody body = errorRespondBodyMapper.createErrorBody(
+                LocalDateTime.now(), status, errors);
         return new ResponseEntity<>(body, status);
     }
 
