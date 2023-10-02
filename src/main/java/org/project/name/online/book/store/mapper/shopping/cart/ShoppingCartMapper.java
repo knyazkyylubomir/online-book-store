@@ -12,6 +12,7 @@ import org.project.name.online.book.store.model.User;
 @Mapper(config = MapperConfig.class)
 public interface ShoppingCartMapper {
     @Mapping(ignore = true, target = "id")
+    @Mapping(ignore = true, target = "deleted")
     ShoppingCart setUserId(User user);
 
     @Mapping(target = "userId", source = "shoppingCart.user.id")

@@ -23,7 +23,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "ShoppingCart API",
+@Tag(name = "Shopping cart API",
         description = "Endpoints for managing cart-items in a shopping cart")
 @RequiredArgsConstructor
 @RestController
