@@ -1,0 +1,14 @@
+databaseChangeLog:
+  - changeSet:
+      id: insert-admin-to-shopping_carts-table
+      author: liubomyr
+      changes:
+        - insert:
+            tableName: shopping_carts
+            columns:
+              - column:
+                  name: id
+                  value: "1"
+              - column:
+                  name: user_id
+                  value: "1"

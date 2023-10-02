@@ -1,9 +1,12 @@
 package org.project.name.online.book.store.mapper.book;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.project.name.online.book.store.config.MapperConfig;
 import org.project.name.online.book.store.dto.book.BookDto;
@@ -19,6 +22,7 @@ public interface BookMapper {
 
     Book toModel(CreateBookRequestDto bookDto, List<Category> categories);
 
+    @Mapping(ignore = true, target = "categories")
     Book mergeEntities(UpdateBookRequestDto bookDto,
                        @MappingTarget Book book, List<Category> categories);
 
@@ -31,5 +35,13 @@ public interface BookMapper {
             categoryIds.add(category.getName());
         }
         bookDto.setCategoryIds(categoryIds);
+    }
+
+    @AfterMapping
+    default void setCategoryIds(@MappingTarget Book book, List<Category> categories) {
+        if (!categories.isEmpty()) {
+            Set<Category> categorySet = new HashSet<>(categories);
+            book.setCategories(categorySet);
+        }
     }
 }
