@@ -14,5 +14,5 @@ public class UpdateBookRequestDto {
     private Double price;
     private String description;
     private String coverImage;
-    private List<Long> categoryIds = Collections.emptyList();
+    private List<@Min(1) Long> categoryIds = Collections.emptyList();
 }

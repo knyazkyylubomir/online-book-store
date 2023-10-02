@@ -69,7 +69,7 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
     @ExceptionHandler(value = ConstraintViolationException.class)
     protected ResponseEntity<Object> handleConstraintViolationException() {
         HttpStatus status = HttpStatus.BAD_REQUEST;
-        List<String> errors = List.of("Id must be greater than or equal to 1");
+        List<String> errors = List.of("ID must be greater than or equal to 1");
         ErrorRespondBody body = errorRespondBodyMapper.createErrorBody(
                 LocalDateTime.now(), status, errors);
         return new ResponseEntity<>(body, status);

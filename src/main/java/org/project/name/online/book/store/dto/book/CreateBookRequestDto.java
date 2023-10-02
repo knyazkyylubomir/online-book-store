@@ -21,5 +21,5 @@ public class CreateBookRequestDto {
     private String description;
     private String coverImage;
     @NotEmpty
-    private List<Long> categoryIds = Collections.emptyList();
+    private List<@Min(1) Long> categoryIds = Collections.emptyList();
 }
