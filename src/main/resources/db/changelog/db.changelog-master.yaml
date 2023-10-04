@@ -29,3 +29,7 @@ databaseChangeLog:
       file: db/changelog/changes/14-insert-admin-to-shopping_carts-table.yaml
   - include:
       file: db/changelog/changes/15-insert-appropriate-categories-to-categories-table.yaml
+  - include:
+      file: db/changelog/changes/16-create-order_items-table.yaml
+  - include:
+      file: db/changelog/changes/17-create-orders-table.yaml

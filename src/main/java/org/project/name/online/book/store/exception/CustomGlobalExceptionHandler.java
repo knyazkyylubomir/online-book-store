@@ -75,6 +75,24 @@ public class CustomGlobalExceptionHandler extends ResponseEntityExceptionHandler
         return new ResponseEntity<>(body, status);
     }
 
+    @ExceptionHandler(value = PriceException.class)
+    protected ResponseEntity<Object> handePriceException(PriceException ex) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        List<String> errors = List.of(ex.getMessage());
+        ErrorRespondBody body = errorRespondBodyMapper.createErrorBody(
+                LocalDateTime.now(), status, errors);
+        return new ResponseEntity<>(body, status);
+    }
+
+    @ExceptionHandler(value = StatusException.class)
+    protected ResponseEntity<Object> handelStatusException(StatusException ex) {
+        HttpStatus status = HttpStatus.BAD_REQUEST;
+        List<String> errors = List.of(ex.getMessage());
+        ErrorRespondBody body = errorRespondBodyMapper.createErrorBody(
+                LocalDateTime.now(), status, errors);
+        return new ResponseEntity<>(body, status);
+    }
+
     private String getErrorMessage(ObjectError e) {
         if (e instanceof FieldError) {
             String field = ((FieldError) e).getField();
