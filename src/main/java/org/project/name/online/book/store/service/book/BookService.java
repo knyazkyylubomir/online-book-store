@@ -19,7 +19,7 @@ public interface BookService {
 
     List<BookDto> searchBook(BookSearchParameters searchParameters, Pageable pageable);
 
-    List<BookDtoWithoutCategoryIds> findAllByCategoryId(Long id);
+    List<BookDtoWithoutCategoryIds> findAllByCategoryId(Long id, Pageable pageable);
 
     void deleteById(Long id);
 }

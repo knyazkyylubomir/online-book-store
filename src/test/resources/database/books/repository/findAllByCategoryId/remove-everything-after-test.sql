@@ -1,0 +1,3 @@
+DELETE FROM books WHERE id BETWEEN 1 AND 3;
+DELETE FROM categories WHERE id BETWEEN 1 AND 2;
+DELETE FROM books_categories WHERE book_id BETWEEN 1 AND 3;
