@@ -38,8 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-
-class CategoryControllerTest {
+class CategoryControllerIntegrationTest {
     protected static MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
@@ -85,12 +84,8 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Create a new category")
     void createCategory_ValidRequestDto_RespondStatusCreated() throws Exception {
-        CreateCategoryRequestDto requestDto = new CreateCategoryRequestDto();
-        requestDto.setName("Test name");
-        requestDto.setDescription("Test name descr.");
-        CategoryDto expected = new CategoryDto();
-        expected.setName(requestDto.getName());
-        expected.setDescription(requestDto.getDescription());
+        CreateCategoryRequestDto requestDto = createCategoryDto();
+        CategoryDto expected = createExpectedDto();
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(post("/categories")
@@ -111,10 +106,7 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Get a category by id")
     void getCategoryById_WhichExistInDb_RespondStatusOk() throws Exception {
-        CategoryDto expected = new CategoryDto();
-        expected.setId(1L);
-        expected.setName("Test name1");
-        expected.setDescription("Test name descr.1");
+        CategoryDto expected = createExpectedDtoFromDb();
 
         MvcResult result = mockMvc.perform(get("/categories/1"))
                 .andExpect(status().isOk())
@@ -130,15 +122,7 @@ class CategoryControllerTest {
     @Test
     @DisplayName("Get all categories")
     void getAll_WhichExistInDb_RespondStatusOk() throws Exception {
-        CategoryDto firstDto = new CategoryDto();
-        firstDto.setId(1L);
-        firstDto.setName("Test name1");
-        firstDto.setDescription("Test name descr.1");
-        CategoryDto secondDto = new CategoryDto();
-        secondDto.setId(2L);
-        secondDto.setName("Test name2");
-        secondDto.setDescription("Test name descr.2");
-        List<CategoryDto> expected = List.of(firstDto, secondDto);
+        List<CategoryDto> expected = createExpectedDtoList();
 
         MvcResult result = mockMvc.perform(get("/categories"))
                 .andExpect(status().isOk())
@@ -161,13 +145,8 @@ class CategoryControllerTest {
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Update a category by id")
     void updateCategory_ValidRequestDto_RespondStatusOk() throws Exception {
-        CreateCategoryRequestDto requestDto = new CreateCategoryRequestDto();
-        requestDto.setName("Update name");
-        requestDto.setDescription("Update descr.");
-        CategoryDto expected = new CategoryDto();
-        expected.setId(3L);
-        expected.setName("Update name");
-        expected.setDescription("Update descr.");
+        CreateCategoryRequestDto requestDto = createUpdateRequestDto();
+        CategoryDto expected = createUpdatedDto();
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(put("/categories/3")
@@ -206,23 +185,7 @@ class CategoryControllerTest {
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Get books by category id")
     void getBooksByCategoryId_WhichExistInDb_RespondStatusOk() throws Exception {
-        BookDtoWithoutCategoryIds firstBookDto = new BookDtoWithoutCategoryIds();
-        firstBookDto.setId(1L);
-        firstBookDto.setTitle("Title1");
-        firstBookDto.setAuthor("Author1");
-        firstBookDto.setIsbn("123456789(1)");
-        firstBookDto.setPrice(98.99);
-        firstBookDto.setDescription("Descr.1");
-        firstBookDto.setCoverImage("Image1");
-        BookDtoWithoutCategoryIds secondBookDto = new BookDtoWithoutCategoryIds();
-        secondBookDto.setId(2L);
-        secondBookDto.setTitle("Title2");
-        secondBookDto.setAuthor("Author2");
-        secondBookDto.setIsbn("123456789(2)");
-        secondBookDto.setPrice(97.99);
-        secondBookDto.setDescription("Descr.2");
-        secondBookDto.setCoverImage("Image2");
-        List<BookDtoWithoutCategoryIds> expected = List.of(firstBookDto, secondBookDto);
+        List<BookDtoWithoutCategoryIds> expected = createListOfDtoWithoutCategoryId();
 
         MvcResult result = mockMvc.perform(get("/categories/1/books"))
                 .andExpect(status().isOk())
@@ -293,5 +256,74 @@ class CategoryControllerTest {
     void getBooksByCategoryId_NotValidId_RespondStatusBadRequest() throws Exception {
         mockMvc.perform(get("/categories/0/books"))
                 .andExpect(status().isBadRequest());
+    }
+
+    private CreateCategoryRequestDto createCategoryDto() {
+        CreateCategoryRequestDto requestDto = new CreateCategoryRequestDto();
+        requestDto.setName("Test name");
+        requestDto.setDescription("Test name descr.");
+        return requestDto;
+    }
+
+    private CategoryDto createExpectedDto() {
+        CategoryDto expected = new CategoryDto();
+        expected.setName("Test name");
+        expected.setDescription("Test name descr.");
+        return expected;
+    }
+
+    private CategoryDto createExpectedDtoFromDb() {
+        CategoryDto expected = new CategoryDto();
+        expected.setId(1L);
+        expected.setName("Test name1");
+        expected.setDescription("Test name descr.1");
+        return expected;
+    }
+
+    private List<CategoryDto> createExpectedDtoList() {
+        CategoryDto firstDto = new CategoryDto();
+        firstDto.setId(1L);
+        firstDto.setName("Test name1");
+        firstDto.setDescription("Test name descr.1");
+        CategoryDto secondDto = new CategoryDto();
+        secondDto.setId(2L);
+        secondDto.setName("Test name2");
+        secondDto.setDescription("Test name descr.2");
+        return List.of(firstDto, secondDto);
+    }
+
+    private CreateCategoryRequestDto createUpdateRequestDto() {
+        CreateCategoryRequestDto requestDto = new CreateCategoryRequestDto();
+        requestDto.setName("Update name");
+        requestDto.setDescription("Update descr.");
+        return requestDto;
+    }
+
+    private CategoryDto createUpdatedDto() {
+        CategoryDto expected = new CategoryDto();
+        expected.setId(3L);
+        expected.setName("Update name");
+        expected.setDescription("Update descr.");
+        return expected;
+    }
+
+    private List<BookDtoWithoutCategoryIds> createListOfDtoWithoutCategoryId() {
+        BookDtoWithoutCategoryIds firstBookDto = new BookDtoWithoutCategoryIds();
+        firstBookDto.setId(1L);
+        firstBookDto.setTitle("Title1");
+        firstBookDto.setAuthor("Author1");
+        firstBookDto.setIsbn("123456789(1)");
+        firstBookDto.setPrice(98.99);
+        firstBookDto.setDescription("Descr.1");
+        firstBookDto.setCoverImage("Image1");
+        BookDtoWithoutCategoryIds secondBookDto = new BookDtoWithoutCategoryIds();
+        secondBookDto.setId(2L);
+        secondBookDto.setTitle("Title2");
+        secondBookDto.setAuthor("Author2");
+        secondBookDto.setIsbn("123456789(2)");
+        secondBookDto.setPrice(97.99);
+        secondBookDto.setDescription("Descr.2");
+        secondBookDto.setCoverImage("Image2");
+        return List.of(firstBookDto, secondBookDto);
     }
 }

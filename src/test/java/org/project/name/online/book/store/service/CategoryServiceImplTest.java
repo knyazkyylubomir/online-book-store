@@ -55,12 +55,8 @@ class CategoryServiceImplTest {
     @Test
     @DisplayName("Save category")
     void save_WithValidFields_ReturnsCategoryDto() {
-        CreateCategoryRequestDto inputDto = new CreateCategoryRequestDto();
-        inputDto.setName("Test name");
-        inputDto.setDescription("Test name descr.");
-        Category category = new Category();
-        category.setName("Test name");
-        category.setDescription("Test name descr.");
+        CreateCategoryRequestDto inputDto = createDtoRequest();
+        Category category = createCategory();
         when(categoryMapper.toEntity(inputDto)).thenReturn(category);
         when(categoryRepository.save(category)).thenReturn(expectedCategory);
         when(categoryMapper.toDto(expectedCategory)).thenReturn(expectedDto);
@@ -92,22 +88,10 @@ class CategoryServiceImplTest {
     @Test
     @DisplayName("Find all books")
     void findAll_WhichPersistInDb_ReturnsListOfCategoryDto() {
-        Category firstCategory = new Category();
-        firstCategory.setId(1L);
-        firstCategory.setName("Test name");
-        firstCategory.setDescription("Test name descr.");
-        Category secondCategory = new Category();
-        secondCategory.setId(2L);
-        secondCategory.setName("Test name2");
-        secondCategory.setDescription("Test nameDescr.2");
-        CategoryDto firstDto = new CategoryDto();
-        firstDto.setId(1L);
-        firstDto.setName("Test name");
-        firstDto.setDescription("Test name descr.");
-        CategoryDto secondDto = new CategoryDto();
-        secondDto.setId(2L);
-        secondDto.setName("Test name2");
-        secondDto.setDescription("Test name descr.2");
+        Category firstCategory = createFirstCategory();
+        Category secondCategory = createSecondCategory();
+        CategoryDto firstDto = cretateFirstCategoryDto();
+        CategoryDto secondDto = createSecondCategoryDto();
         List<Category> categories = List.of(firstCategory, secondCategory);
         Pageable pageable = PageRequest.of(0, 10);
         PageImpl<Category> categoryPage = new PageImpl<>(
@@ -131,21 +115,10 @@ class CategoryServiceImplTest {
     @Test
     @DisplayName("Update a category by category id")
     void update_WhichPersistInDb_ReturnsCategoryDto() {
-        Category expectedCategory = new Category();
-        expectedCategory.setId(1L);
-        expectedCategory.setName("Test name");
-        expectedCategory.setDescription("Test name descr.");
-        CreateCategoryRequestDto inputDto = new CreateCategoryRequestDto();
-        inputDto.setName("Update name");
-        inputDto.setDescription("Update descr.");
-        Category updatedCategory = new Category();
-        updatedCategory.setId(1L);
-        updatedCategory.setName("Update name");
-        updatedCategory.setDescription("Update descr.");
-        CategoryDto expectedDto = new CategoryDto();
-        expectedDto.setId(1L);
-        expectedDto.setName("Update name");
-        expectedDto.setDescription("Update descr.");
+        Category expectedCategory = createExpectedCategory();
+        CreateCategoryRequestDto inputDto = createUpdateDtoRequest();
+        Category updatedCategory = createUpdatedCategory();
+        CategoryDto expectedDto = createExpectedDto();
         Long categoryId = 1L;
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(expectedCategory));
         when(categoryMapper.mergeEntities(inputDto, expectedCategory)).thenReturn(updatedCategory);
@@ -245,5 +218,82 @@ class CategoryServiceImplTest {
         assertEquals(expected, actual);
         verify(categoryRepository, times(1)).findById(nonExistentCategoryId);
         verifyNoMoreInteractions(categoryRepository);
+    }
+
+    private CreateCategoryRequestDto createDtoRequest() {
+        CreateCategoryRequestDto inputDto = new CreateCategoryRequestDto();
+        inputDto.setName("Test name");
+        inputDto.setDescription("Test name descr.");
+        return inputDto;
+    }
+
+    private Category createCategory() {
+        Category category = new Category();
+        category.setName("Test name");
+        category.setDescription("Test name descr.");
+        return category;
+    }
+
+    private Category createFirstCategory() {
+        Category firstCategory = new Category();
+        firstCategory.setId(1L);
+        firstCategory.setName("Test name");
+        firstCategory.setDescription("Test name descr.");
+        return firstCategory;
+    }
+
+    private Category createSecondCategory() {
+        Category secondCategory = new Category();
+        secondCategory.setId(2L);
+        secondCategory.setName("Test name2");
+        secondCategory.setDescription("Test nameDescr.2");
+        return secondCategory;
+    }
+
+    private CategoryDto cretateFirstCategoryDto() {
+        CategoryDto firstDto = new CategoryDto();
+        firstDto.setId(1L);
+        firstDto.setName("Test name");
+        firstDto.setDescription("Test name descr.");
+        return firstDto;
+    }
+
+    private CategoryDto createSecondCategoryDto() {
+        CategoryDto secondDto = new CategoryDto();
+        secondDto.setId(2L);
+        secondDto.setName("Test name2");
+        secondDto.setDescription("Test name descr.2");
+        return secondDto;
+    }
+
+    private Category createExpectedCategory() {
+        Category expectedCategory = new Category();
+        expectedCategory.setId(1L);
+        expectedCategory.setName("Test name");
+        expectedCategory.setDescription("Test name descr.");
+        return expectedCategory;
+    }
+
+    private CreateCategoryRequestDto createUpdateDtoRequest() {
+        CreateCategoryRequestDto inputDto = new CreateCategoryRequestDto();
+        inputDto.setName("Update name");
+        inputDto.setDescription("Update descr.");
+        return inputDto;
+    }
+
+    private Category createUpdatedCategory() {
+        Category updatedCategory = new Category();
+        updatedCategory.setId(1L);
+        updatedCategory.setName("Update name");
+        updatedCategory.setDescription("Update descr.");
+        return updatedCategory;
+    }
+
+    private CategoryDto createExpectedDto() {
+        CategoryDto expectedDto = new CategoryDto();
+        expectedDto.setId(1L);
+        expectedDto.setName("Update name");
+        expectedDto.setDescription("Update descr.");
+        return expectedDto;
     }
 }

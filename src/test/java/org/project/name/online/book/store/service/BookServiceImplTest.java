@@ -95,22 +95,8 @@ class BookServiceImplTest {
     @Test
     @DisplayName("Save book with valid input bookRequestDto")
     void save_WithValidFields_ReturnsBookDto() {
-        CreateBookRequestDto inputDto = new CreateBookRequestDto();
-        inputDto.setTitle("Title");
-        inputDto.setAuthor("Author");
-        inputDto.setIsbn("123456789");
-        inputDto.setPrice(99.99);
-        inputDto.setDescription("Descr.");
-        inputDto.setCoverImage("Image");
-        inputDto.setCategoryIds(List.of(1L));
-        Book book = new Book();
-        book.setTitle("Title");
-        book.setAuthor("Author");
-        book.setIsbn("123456789");
-        book.setPrice(BigDecimal.valueOf(99.99));
-        book.setDescription("Descr.");
-        book.setCoverImage("Image");
-        book.setCategories(Set.of(category));
+        CreateBookRequestDto inputDto = createDtoRequest();
+        Book book = createBookWithoutId();
         when(bookRepository.findByIsbn(inputDto.getIsbn())).thenReturn(Optional.empty());
         when(categoryRepository.findById(category.getId())).thenReturn(Optional.of(category));
         when(bookMapper.toModel(inputDto, List.of(category))).thenReturn(book);
@@ -146,42 +132,10 @@ class BookServiceImplTest {
     @Test
     @DisplayName("Find all books")
     void findAll_WhichPersistInDb_ReturnsListOfBookDto() {
-        Book firstBook = new Book();
-        firstBook.setId(1L);
-        firstBook.setTitle("Title");
-        firstBook.setAuthor("Author");
-        firstBook.setIsbn("123456789");
-        firstBook.setPrice(BigDecimal.valueOf(99.99));
-        firstBook.setDescription("Descr.");
-        firstBook.setCoverImage("Image");
-        firstBook.setCategories(Set.of(firstCategory));
-        BookDto firstBookDto = new BookDto();
-        firstBookDto.setId(1L);
-        firstBookDto.setTitle("Title");
-        firstBookDto.setAuthor("Author");
-        firstBookDto.setIsbn("123456789");
-        firstBookDto.setPrice(99.99);
-        firstBookDto.setDescription("Descr.");
-        firstBookDto.setCoverImage("Image");
-        firstBookDto.setCategoryIds(List.of("Test name"));
-        Book secondBook = new Book();
-        secondBook.setId(2L);
-        secondBook.setTitle("Title2");
-        secondBook.setAuthor("Author2");
-        secondBook.setIsbn("123456789(2)");
-        secondBook.setPrice(BigDecimal.valueOf(98.99));
-        secondBook.setDescription("Descr.2");
-        secondBook.setCoverImage("Image2");
-        secondBook.setCategories(Set.of(secondCategory));
-        BookDto secondBookDto = new BookDto();
-        secondBookDto.setId(2L);
-        secondBookDto.setTitle("Title2");
-        secondBookDto.setAuthor("Author2");
-        secondBookDto.setIsbn("123456789(2)");
-        secondBookDto.setPrice(98.99);
-        secondBookDto.setDescription("Descr.2");
-        secondBookDto.setCoverImage("Image2");
-        secondBookDto.setCategoryIds(List.of("Test name2"));
+        Book firstBook = createFirstBookWithFirstCategory();
+        BookDto firstBookDto = createFirstBookDto();
+        Book secondBook = createSecondBookWithSecondCategory();
+        BookDto secondBookDto = createSecondBookDto();
         List<Book> books = List.of(firstBook, secondBook);
         Pageable pageable = PageRequest.of(0, 10);
         PageImpl<Book> bookPage = new PageImpl<>(
@@ -206,40 +160,10 @@ class BookServiceImplTest {
     @Test
     @DisplayName("Update a book by book id")
     void updateBookById_WhichPersistInDb_ReturnsBookDto() {
-        Book expectedBook = new Book();
-        expectedBook.setId(1L);
-        expectedBook.setTitle("Title");
-        expectedBook.setAuthor("Author");
-        expectedBook.setIsbn("123456789");
-        expectedBook.setPrice(BigDecimal.valueOf(99.99));
-        expectedBook.setDescription("Descr.");
-        expectedBook.setCoverImage("Image");
-        expectedBook.setCategories(Set.of(firstCategory));
-        Book updatedBook = new Book();
-        updatedBook.setId(1L);
-        updatedBook.setTitle("Update title");
-        updatedBook.setAuthor("Update author");
-        updatedBook.setIsbn("Update isbn");
-        updatedBook.setPrice(BigDecimal.valueOf(34.54));
-        updatedBook.setCoverImage("Update image");
-        updatedBook.setCategories(Set.of(secondCategory));
-        UpdateBookRequestDto inputDto = new UpdateBookRequestDto();
-        inputDto.setTitle("Update title");
-        inputDto.setAuthor("Update author");
-        inputDto.setIsbn("Update isbn");
-        inputDto.setPrice(34.54);
-        inputDto.setDescription("Update descr.");
-        inputDto.setCoverImage("Update image");
-        inputDto.setCategoryIds(List.of(2L));
-        BookDto expectedBookDto = new BookDto();
-        expectedBookDto.setId(1L);
-        expectedBookDto.setTitle("Update title");
-        expectedBookDto.setAuthor("Update author");
-        expectedBookDto.setIsbn("Update isbn");
-        expectedBookDto.setPrice(34.54);
-        expectedBookDto.setDescription("Update descr.");
-        expectedBookDto.setCoverImage("Update image");
-        expectedBookDto.setCategoryIds(List.of("Test name2"));
+        Book expectedBook = createExpectedBook();
+        Book updatedBook = createUpdatedBook();
+        UpdateBookRequestDto inputDto = createUpdateDtoRequest();
+        BookDto expectedBookDto = createExpectedBookDtoWithUpdates();
         Long bookId = 1L;
         when(bookRepository.findByIsbn(inputDto.getIsbn())).thenReturn(Optional.empty());
         when(bookRepository.findById(bookId)).thenReturn(Optional.of(expectedBook));
@@ -269,24 +193,8 @@ class BookServiceImplTest {
     @Test
     @DisplayName("Find books by specifications")
     void searchBook_ByValidSearchParameters_ReturnsListOfBookDto() {
-        Book book = new Book();
-        book.setId(1L);
-        book.setTitle("Title");
-        book.setAuthor("Author");
-        book.setIsbn("123456789");
-        book.setPrice(BigDecimal.valueOf(99.99));
-        book.setDescription("Descr.");
-        book.setCoverImage("Image");
-        book.setCategories(Set.of(category));
-        BookDto expectedBookDto = new BookDto();
-        expectedBookDto.setId(1L);
-        expectedBookDto.setTitle("Title");
-        expectedBookDto.setAuthor("Author");
-        expectedBookDto.setIsbn("123456789");
-        expectedBookDto.setPrice(99.99);
-        expectedBookDto.setDescription("Descr.");
-        expectedBookDto.setCoverImage("Image");
-        expectedBookDto.setCategoryIds(List.of("Test name"));
+        Book book = createBookWithId();
+        BookDto expectedBookDto = createExpectedBookDto();
         BookSearchParameters bookSearchParameters = new BookSearchParameters(
                 new String[]{"Author"}, new String[]{"99", "100"}
         );
@@ -314,40 +222,10 @@ class BookServiceImplTest {
     @Test
     @DisplayName("Find all books by category id")
     void findAllByCategoryId_WhichPersistInDb_ReturnsListOfBookDto() {
-        Book firstBook = new Book();
-        firstBook.setId(1L);
-        firstBook.setTitle("Title");
-        firstBook.setAuthor("Author");
-        firstBook.setIsbn("123456789");
-        firstBook.setPrice(BigDecimal.valueOf(99.99));
-        firstBook.setDescription("Descr.");
-        firstBook.setCoverImage("Image");
-        firstBook.setCategories(Set.of(category));
-        BookDtoWithoutCategoryIds firstBookDto = new BookDtoWithoutCategoryIds();
-        firstBookDto.setId(1L);
-        firstBookDto.setTitle("Title");
-        firstBookDto.setAuthor("Author");
-        firstBookDto.setIsbn("123456789");
-        firstBookDto.setPrice(99.99);
-        firstBookDto.setDescription("Descr.");
-        firstBookDto.setCoverImage("Image");
-        Book secondBook = new Book();
-        secondBook.setId(2L);
-        secondBook.setTitle("Title2");
-        secondBook.setAuthor("Author2");
-        secondBook.setIsbn("123456789(2)");
-        secondBook.setPrice(BigDecimal.valueOf(98.99));
-        secondBook.setDescription("Descr.2");
-        secondBook.setCoverImage("Image2");
-        secondBook.setCategories(Set.of(category));
-        BookDtoWithoutCategoryIds secondBookDto = new BookDtoWithoutCategoryIds();
-        secondBookDto.setId(2L);
-        secondBookDto.setTitle("Title2");
-        secondBookDto.setAuthor("Author2");
-        secondBookDto.setIsbn("123456789(2)");
-        secondBookDto.setPrice(98.99);
-        secondBookDto.setDescription("Descr.2");
-        secondBookDto.setCoverImage("Image2");
+        Book firstBook = createFirstBook();
+        BookDtoWithoutCategoryIds firstBookDto = createFirstDtoWithoutCategoryIds();
+        Book secondBook = createSecondBook();
+        BookDtoWithoutCategoryIds secondBookDto = createSecondDtoWithoutCategoryIds();
         Pageable pageable = PageRequest.of(0, 10);
         List<Book> books = List.of(firstBook, secondBook);
         Long categoryId = 1L;
@@ -593,5 +471,207 @@ class BookServiceImplTest {
         assertEquals(expected, actual);
         verify(bookRepository, times(1)).findById(nonExistentBookId);
         verifyNoMoreInteractions(bookRepository);
+    }
+
+    private CreateBookRequestDto createDtoRequest() {
+        CreateBookRequestDto inputDto = new CreateBookRequestDto();
+        inputDto.setTitle("Title");
+        inputDto.setAuthor("Author");
+        inputDto.setIsbn("123456789");
+        inputDto.setPrice(99.99);
+        inputDto.setDescription("Descr.");
+        inputDto.setCoverImage("Image");
+        inputDto.setCategoryIds(List.of(1L));
+        return inputDto;
+    }
+
+    private Book createBookWithoutId() {
+        Book book = new Book();
+        book.setTitle("Title");
+        book.setAuthor("Author");
+        book.setIsbn("123456789");
+        book.setPrice(BigDecimal.valueOf(99.99));
+        book.setDescription("Descr.");
+        book.setCoverImage("Image");
+        book.setCategories(Set.of(category));
+        return book;
+    }
+
+    private Book createFirstBookWithFirstCategory() {
+        Book firstBook = new Book();
+        firstBook.setId(1L);
+        firstBook.setTitle("Title");
+        firstBook.setAuthor("Author");
+        firstBook.setIsbn("123456789");
+        firstBook.setPrice(BigDecimal.valueOf(99.99));
+        firstBook.setDescription("Descr.");
+        firstBook.setCoverImage("Image");
+        firstBook.setCategories(Set.of(firstCategory));
+        return firstBook;
+    }
+
+    private Book createSecondBookWithSecondCategory() {
+        Book secondBook = new Book();
+        secondBook.setId(2L);
+        secondBook.setTitle("Title2");
+        secondBook.setAuthor("Author2");
+        secondBook.setIsbn("123456789(2)");
+        secondBook.setPrice(BigDecimal.valueOf(98.99));
+        secondBook.setDescription("Descr.2");
+        secondBook.setCoverImage("Image2");
+        secondBook.setCategories(Set.of(secondCategory));
+        return secondBook;
+    }
+
+    private BookDto createFirstBookDto() {
+        BookDto firstBookDto = new BookDto();
+        firstBookDto.setId(1L);
+        firstBookDto.setTitle("Title");
+        firstBookDto.setAuthor("Author");
+        firstBookDto.setIsbn("123456789");
+        firstBookDto.setPrice(99.99);
+        firstBookDto.setDescription("Descr.");
+        firstBookDto.setCoverImage("Image");
+        firstBookDto.setCategoryIds(List.of("Test name"));
+        return firstBookDto;
+    }
+
+    private BookDto createSecondBookDto() {
+        BookDto secondBookDto = new BookDto();
+        secondBookDto.setId(2L);
+        secondBookDto.setTitle("Title2");
+        secondBookDto.setAuthor("Author2");
+        secondBookDto.setIsbn("123456789(2)");
+        secondBookDto.setPrice(98.99);
+        secondBookDto.setDescription("Descr.2");
+        secondBookDto.setCoverImage("Image2");
+        secondBookDto.setCategoryIds(List.of("Test name2"));
+        return secondBookDto;
+    }
+
+    private Book createExpectedBook() {
+        Book expectedBook = new Book();
+        expectedBook.setId(1L);
+        expectedBook.setTitle("Title");
+        expectedBook.setAuthor("Author");
+        expectedBook.setIsbn("123456789");
+        expectedBook.setPrice(BigDecimal.valueOf(99.99));
+        expectedBook.setDescription("Descr.");
+        expectedBook.setCoverImage("Image");
+        expectedBook.setCategories(Set.of(firstCategory));
+        return expectedBook;
+    }
+
+    private Book createUpdatedBook() {
+        Book updatedBook = new Book();
+        updatedBook.setId(1L);
+        updatedBook.setTitle("Update title");
+        updatedBook.setAuthor("Update author");
+        updatedBook.setIsbn("Update isbn");
+        updatedBook.setPrice(BigDecimal.valueOf(34.54));
+        updatedBook.setCoverImage("Update image");
+        updatedBook.setCategories(Set.of(secondCategory));
+        return updatedBook;
+    }
+
+    private UpdateBookRequestDto createUpdateDtoRequest() {
+        UpdateBookRequestDto inputDto = new UpdateBookRequestDto();
+        inputDto.setTitle("Update title");
+        inputDto.setAuthor("Update author");
+        inputDto.setIsbn("Update isbn");
+        inputDto.setPrice(34.54);
+        inputDto.setDescription("Update descr.");
+        inputDto.setCoverImage("Update image");
+        inputDto.setCategoryIds(List.of(2L));
+        return inputDto;
+    }
+
+    private BookDto createExpectedBookDtoWithUpdates() {
+        BookDto expectedBookDto = new BookDto();
+        expectedBookDto.setId(1L);
+        expectedBookDto.setTitle("Update title");
+        expectedBookDto.setAuthor("Update author");
+        expectedBookDto.setIsbn("Update isbn");
+        expectedBookDto.setPrice(34.54);
+        expectedBookDto.setDescription("Update descr.");
+        expectedBookDto.setCoverImage("Update image");
+        expectedBookDto.setCategoryIds(List.of("Test name2"));
+        return expectedBookDto;
+    }
+
+    private Book createBookWithId() {
+        Book book = new Book();
+        book.setId(1L);
+        book.setTitle("Title");
+        book.setAuthor("Author");
+        book.setIsbn("123456789");
+        book.setPrice(BigDecimal.valueOf(99.99));
+        book.setDescription("Descr.");
+        book.setCoverImage("Image");
+        book.setCategories(Set.of(category));
+        return book;
+    }
+
+    private BookDto createExpectedBookDto() {
+        BookDto expectedBookDto = new BookDto();
+        expectedBookDto.setId(1L);
+        expectedBookDto.setTitle("Title");
+        expectedBookDto.setAuthor("Author");
+        expectedBookDto.setIsbn("123456789");
+        expectedBookDto.setPrice(99.99);
+        expectedBookDto.setDescription("Descr.");
+        expectedBookDto.setCoverImage("Image");
+        expectedBookDto.setCategoryIds(List.of("Test name"));
+        return expectedBookDto;
+    }
+
+    private Book createFirstBook() {
+        Book firstBook = new Book();
+        firstBook.setId(1L);
+        firstBook.setTitle("Title");
+        firstBook.setAuthor("Author");
+        firstBook.setIsbn("123456789");
+        firstBook.setPrice(BigDecimal.valueOf(99.99));
+        firstBook.setDescription("Descr.");
+        firstBook.setCoverImage("Image");
+        firstBook.setCategories(Set.of(category));
+        return firstBook;
+    }
+
+    private BookDtoWithoutCategoryIds createFirstDtoWithoutCategoryIds() {
+        BookDtoWithoutCategoryIds firstBookDto = new BookDtoWithoutCategoryIds();
+        firstBookDto.setId(1L);
+        firstBookDto.setTitle("Title");
+        firstBookDto.setAuthor("Author");
+        firstBookDto.setIsbn("123456789");
+        firstBookDto.setPrice(99.99);
+        firstBookDto.setDescription("Descr.");
+        firstBookDto.setCoverImage("Image");
+        return firstBookDto;
+    }
+
+    private Book createSecondBook() {
+        Book secondBook = new Book();
+        secondBook.setId(2L);
+        secondBook.setTitle("Title2");
+        secondBook.setAuthor("Author2");
+        secondBook.setIsbn("123456789(2)");
+        secondBook.setPrice(BigDecimal.valueOf(98.99));
+        secondBook.setDescription("Descr.2");
+        secondBook.setCoverImage("Image2");
+        secondBook.setCategories(Set.of(category));
+        return secondBook;
+    }
+
+    private BookDtoWithoutCategoryIds createSecondDtoWithoutCategoryIds() {
+        BookDtoWithoutCategoryIds secondBookDto = new BookDtoWithoutCategoryIds();
+        secondBookDto.setId(2L);
+        secondBookDto.setTitle("Title2");
+        secondBookDto.setAuthor("Author2");
+        secondBookDto.setIsbn("123456789(2)");
+        secondBookDto.setPrice(98.99);
+        secondBookDto.setDescription("Descr.2");
+        secondBookDto.setCoverImage("Image2");
+        return secondBookDto;
     }
 }

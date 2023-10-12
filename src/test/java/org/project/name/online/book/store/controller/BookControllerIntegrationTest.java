@@ -38,7 +38,7 @@ import org.springframework.web.context.WebApplicationContext;
 import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-class BookControllerTest {
+class BookControllerIntegrationTest {
     protected static MockMvc mockMvc;
     @Autowired
     private ObjectMapper objectMapper;
@@ -94,22 +94,8 @@ class BookControllerTest {
     @Test
     @DisplayName("Create a new book")
     void createBook_ValidRequestDto_RespondStatusCreated() throws Exception {
-        CreateBookRequestDto requestDto = new CreateBookRequestDto();
-        requestDto.setTitle("Title");
-        requestDto.setAuthor("Author");
-        requestDto.setIsbn("123456789");
-        requestDto.setPrice(99.99);
-        requestDto.setDescription("Descr.");
-        requestDto.setCoverImage("Image");
-        requestDto.setCategoryIds(List.of(1L));
-        BookDto expected = new BookDto();
-        expected.setTitle(requestDto.getTitle());
-        expected.setAuthor(requestDto.getAuthor());
-        expected.setIsbn(requestDto.getIsbn());
-        expected.setPrice(requestDto.getPrice());
-        expected.setDescription(requestDto.getDescription());
-        expected.setCoverImage(requestDto.getCoverImage());
-        expected.setCategoryIds(List.of("Test name1"));
+        CreateBookRequestDto requestDto = createBookRequest();
+        BookDto expected = createExpectedDto();
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(post("/books")
@@ -130,15 +116,7 @@ class BookControllerTest {
     @Test
     @DisplayName("Get a book by id")
     void getBookById_WhichExistInDb_RespondStatusOk() throws Exception {
-        BookDto expected = new BookDto();
-        expected.setId(1L);
-        expected.setTitle("Title1");
-        expected.setAuthor("Author1");
-        expected.setIsbn("123456789(1)");
-        expected.setPrice(98.99);
-        expected.setDescription("Descr.1");
-        expected.setCoverImage("Image1");
-        expected.setCategoryIds(List.of("Test name1"));
+        BookDto expected = createExpectedDtoFromDb();
 
         MvcResult result = mockMvc.perform(get("/books/1"))
                 .andExpect(status().isOk())
@@ -154,25 +132,7 @@ class BookControllerTest {
     @Test
     @DisplayName("Get all books")
     void getAll_WhichExistInDb_RespondStatusOk() throws Exception {
-        BookDto firstBookDto = new BookDto();
-        firstBookDto.setId(1L);
-        firstBookDto.setTitle("Title1");
-        firstBookDto.setAuthor("Author1");
-        firstBookDto.setIsbn("123456789(1)");
-        firstBookDto.setPrice(98.99);
-        firstBookDto.setDescription("Descr.1");
-        firstBookDto.setCoverImage("Image1");
-        firstBookDto.setCategoryIds(List.of("Test name1"));
-        BookDto secondBookDto = new BookDto();
-        secondBookDto.setId(2L);
-        secondBookDto.setTitle("Title2");
-        secondBookDto.setAuthor("Author2");
-        secondBookDto.setIsbn("123456789(2)");
-        secondBookDto.setPrice(97.99);
-        secondBookDto.setDescription("Descr.2");
-        secondBookDto.setCoverImage("Image2");
-        secondBookDto.setCategoryIds(List.of("Test name2"));
-        List<BookDto> expected = List.of(firstBookDto, secondBookDto);
+        List<BookDto> expected = createExpectedDtoList();
 
         MvcResult result = mockMvc.perform(get("/books"))
                 .andExpect(status().isOk())
@@ -195,23 +155,8 @@ class BookControllerTest {
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     @DisplayName("Update a book by id")
     void updateBook_ValidRequestDto_RespondStatusOk() throws Exception {
-        UpdateBookRequestDto requestDto = new UpdateBookRequestDto();
-        requestDto.setTitle("Update title");
-        requestDto.setAuthor("Update author");
-        requestDto.setIsbn("Update isbn");
-        requestDto.setPrice(34.54);
-        requestDto.setDescription("Update descr.");
-        requestDto.setCoverImage("Update image");
-        requestDto.setCategoryIds(List.of(3L));
-        BookDto expected = new BookDto();
-        expected.setId(3L);
-        expected.setTitle("Update title");
-        expected.setAuthor("Update author");
-        expected.setIsbn("Update isbn");
-        expected.setPrice(34.54);
-        expected.setDescription("Update descr.");
-        expected.setCoverImage("Update image");
-        expected.setCategoryIds(List.of("Test name for update"));
+        UpdateBookRequestDto requestDto = createExpectedUpdateDto();
+        BookDto expected = createUpdatedBookDto();
 
         String jsonRequest = objectMapper.writeValueAsString(requestDto);
         MvcResult result = mockMvc.perform(put("/books/3")
@@ -230,16 +175,7 @@ class BookControllerTest {
     @Test
     @DisplayName("Search a book with search parameters")
     void searchBook_ValidSearchParameters_RespondStatusOk() throws Exception {
-        BookDto expectedDto = new BookDto();
-        expectedDto.setId(2L);
-        expectedDto.setTitle("Title2");
-        expectedDto.setAuthor("Author2");
-        expectedDto.setIsbn("123456789(2)");
-        expectedDto.setPrice(97.99);
-        expectedDto.setDescription("Descr.2");
-        expectedDto.setCoverImage("Image2");
-        expectedDto.setCategoryIds(List.of("Test name2"));
-        List<BookDto> expected = List.of(expectedDto);
+        List<BookDto> expected = createExpectedListAfterSearchBook();
 
         MvcResult result = mockMvc.perform(get("/books/search")
                         .param("authors", "Author2")
@@ -322,5 +258,102 @@ class BookControllerTest {
     void deleteBook_NotValidId_RespondStatusBadRequest() throws Exception {
         mockMvc.perform(delete("/books/0"))
                 .andExpect(status().isBadRequest());
+    }
+
+    private CreateBookRequestDto createBookRequest() {
+        CreateBookRequestDto requestDto = new CreateBookRequestDto();
+        requestDto.setTitle("Title");
+        requestDto.setAuthor("Author");
+        requestDto.setIsbn("123456789");
+        requestDto.setPrice(99.99);
+        requestDto.setDescription("Descr.");
+        requestDto.setCoverImage("Image");
+        requestDto.setCategoryIds(List.of(1L));
+        return requestDto;
+    }
+
+    private BookDto createExpectedDto() {
+        BookDto expected = new BookDto();
+        expected.setTitle("Title");
+        expected.setAuthor("Author");
+        expected.setIsbn("123456789");
+        expected.setPrice(99.99);
+        expected.setDescription("Descr.");
+        expected.setCoverImage("Image");
+        expected.setCategoryIds(List.of("Test name1"));
+        return expected;
+    }
+
+    private BookDto createExpectedDtoFromDb() {
+        BookDto expected = new BookDto();
+        expected.setId(1L);
+        expected.setTitle("Title1");
+        expected.setAuthor("Author1");
+        expected.setIsbn("123456789(1)");
+        expected.setPrice(98.99);
+        expected.setDescription("Descr.1");
+        expected.setCoverImage("Image1");
+        expected.setCategoryIds(List.of("Test name1"));
+        return expected;
+    }
+
+    private List<BookDto> createExpectedDtoList() {
+        BookDto firstBookDto = new BookDto();
+        firstBookDto.setId(1L);
+        firstBookDto.setTitle("Title1");
+        firstBookDto.setAuthor("Author1");
+        firstBookDto.setIsbn("123456789(1)");
+        firstBookDto.setPrice(98.99);
+        firstBookDto.setDescription("Descr.1");
+        firstBookDto.setCoverImage("Image1");
+        firstBookDto.setCategoryIds(List.of("Test name1"));
+        BookDto secondBookDto = new BookDto();
+        secondBookDto.setId(2L);
+        secondBookDto.setTitle("Title2");
+        secondBookDto.setAuthor("Author2");
+        secondBookDto.setIsbn("123456789(2)");
+        secondBookDto.setPrice(97.99);
+        secondBookDto.setDescription("Descr.2");
+        secondBookDto.setCoverImage("Image2");
+        secondBookDto.setCategoryIds(List.of("Test name2"));
+        return List.of(firstBookDto, secondBookDto);
+    }
+
+    private UpdateBookRequestDto createExpectedUpdateDto() {
+        UpdateBookRequestDto requestDto = new UpdateBookRequestDto();
+        requestDto.setTitle("Update title");
+        requestDto.setAuthor("Update author");
+        requestDto.setIsbn("Update isbn");
+        requestDto.setPrice(34.54);
+        requestDto.setDescription("Update descr.");
+        requestDto.setCoverImage("Update image");
+        requestDto.setCategoryIds(List.of(3L));
+        return requestDto;
+    }
+
+    private BookDto createUpdatedBookDto() {
+        BookDto expected = new BookDto();
+        expected.setId(3L);
+        expected.setTitle("Update title");
+        expected.setAuthor("Update author");
+        expected.setIsbn("Update isbn");
+        expected.setPrice(34.54);
+        expected.setDescription("Update descr.");
+        expected.setCoverImage("Update image");
+        expected.setCategoryIds(List.of("Test name for update"));
+        return expected;
+    }
+
+    private List<BookDto> createExpectedListAfterSearchBook() {
+        BookDto expectedDto = new BookDto();
+        expectedDto.setId(2L);
+        expectedDto.setTitle("Title2");
+        expectedDto.setAuthor("Author2");
+        expectedDto.setIsbn("123456789(2)");
+        expectedDto.setPrice(97.99);
+        expectedDto.setDescription("Descr.2");
+        expectedDto.setCoverImage("Image2");
+        expectedDto.setCategoryIds(List.of("Test name2"));
+        return List.of(expectedDto);
     }
 }

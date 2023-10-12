@@ -22,7 +22,7 @@ import org.testcontainers.shaded.org.apache.commons.lang3.builder.EqualsBuilder;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
-class BookRepositoryTest {
+class BookRepositoryIntegrationTest {
     @Autowired
     private BookRepository bookRepository;
 
@@ -41,19 +41,7 @@ class BookRepositoryTest {
             + "remove-everything-after-test.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findByIsbn_ExistentIsbn_ReturnsBook() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Test name");
-        category.setDescription("Test name descr.");
-        Book expected = new Book();
-        expected.setId(1L);
-        expected.setTitle("Title");
-        expected.setAuthor("Author");
-        expected.setIsbn("123456789");
-        expected.setDescription("Descr.");
-        expected.setCoverImage("Image");
-        expected.setPrice(BigDecimal.valueOf(99.99));
-        expected.setCategories(Set.of(category));
+        Book expected = createExpectedBook();
 
         Book actual = bookRepository.findByIsbn("123456789").orElseThrow(
                 () -> new EntityNotFoundException("Error occurred!"));
@@ -77,29 +65,7 @@ class BookRepositoryTest {
             + "remove-everything-after-test.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findAllByCategoryId_ExistentCategoryId_ReturnsBooks() {
-        Category category = new Category();
-        category.setId(1L);
-        category.setName("Test name");
-        category.setDescription("Test name descr.");
-        Book first = new Book();
-        first.setId(1L);
-        first.setTitle("Title");
-        first.setAuthor("Author");
-        first.setIsbn("123456789");
-        first.setPrice(BigDecimal.valueOf(99.99));
-        first.setDescription("Descr.");
-        first.setCoverImage("Image");
-        first.setCategories(Set.of(category));
-        Book second = new Book();
-        second.setId(2L);
-        second.setTitle("Title2");
-        second.setAuthor("Author2");
-        second.setIsbn("123456789(2)");
-        second.setPrice(BigDecimal.valueOf(98.99));
-        second.setDescription("Descr.2");
-        second.setCoverImage("Image2");
-        second.setCategories(Set.of(category));
-        List<Book> expected = List.of(first, second);
+        List<Book> expected = createExpectedListOfBook();
         Pageable pageable = PageRequest.of(0, 10);
 
         List<Book> actual = bookRepository.findAllByCategoryId(1L, pageable);
@@ -127,20 +93,7 @@ class BookRepositoryTest {
             + "remove-everything-after-test.sql",
             executionPhase = Sql.ExecutionPhase.AFTER_TEST_METHOD)
     void findAllByCategoryId_ExistentCategoryId_ReturnsBook() {
-        Category category = new Category();
-        category.setId(2L);
-        category.setName("Test name2");
-        category.setDescription("Test name descr.2");
-        Book book = new Book();
-        book.setId(3L);
-        book.setTitle("Title3");
-        book.setAuthor("Author3");
-        book.setIsbn("123456789(3)");
-        book.setPrice(BigDecimal.valueOf(97.99));
-        book.setDescription("Descr.3");
-        book.setCoverImage("Image3");
-        book.setCategories(Set.of(category));
-        List<Book> expected = List.of(book);
+        List<Book> expected = createBookListOfOneBook();
         Pageable pageable = PageRequest.of(0, 10);
 
         List<Book> actual = bookRepository.findAllByCategoryId(2L, pageable);
@@ -154,9 +107,9 @@ class BookRepositoryTest {
     @Test
     @DisplayName("Returns optional empty since book with given isbn doesn't exist")
     void findByIsbn_NonExistentIsbn_ReturnsOptionalEmpty() {
-        String isbn = "123456789";
         Optional<Object> expected = Optional.empty();
 
+        String isbn = "123456789";
         Optional<Book> actual = bookRepository.findByIsbn(isbn);
 
         Assertions.assertEquals(expected, actual);
@@ -199,5 +152,65 @@ class BookRepositoryTest {
 
         Assertions.assertNotNull(actual);
         Assertions.assertEquals(expected, actual);
+    }
+
+    private Book createExpectedBook() {
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Test name");
+        category.setDescription("Test name descr.");
+        Book expected = new Book();
+        expected.setId(1L);
+        expected.setTitle("Title");
+        expected.setAuthor("Author");
+        expected.setIsbn("123456789");
+        expected.setDescription("Descr.");
+        expected.setCoverImage("Image");
+        expected.setPrice(BigDecimal.valueOf(99.99));
+        expected.setCategories(Set.of(category));
+        return expected;
+    }
+
+    private List<Book> createExpectedListOfBook() {
+        Category category = new Category();
+        category.setId(1L);
+        category.setName("Test name");
+        category.setDescription("Test name descr.");
+        Book first = new Book();
+        first.setId(1L);
+        first.setTitle("Title");
+        first.setAuthor("Author");
+        first.setIsbn("123456789");
+        first.setPrice(BigDecimal.valueOf(99.99));
+        first.setDescription("Descr.");
+        first.setCoverImage("Image");
+        first.setCategories(Set.of(category));
+        Book second = new Book();
+        second.setId(2L);
+        second.setTitle("Title2");
+        second.setAuthor("Author2");
+        second.setIsbn("123456789(2)");
+        second.setPrice(BigDecimal.valueOf(98.99));
+        second.setDescription("Descr.2");
+        second.setCoverImage("Image2");
+        second.setCategories(Set.of(category));
+        return List.of(first, second);
+    }
+
+    private List<Book> createBookListOfOneBook() {
+        Category category = new Category();
+        category.setId(2L);
+        category.setName("Test name2");
+        category.setDescription("Test name descr.2");
+        Book book = new Book();
+        book.setId(3L);
+        book.setTitle("Title3");
+        book.setAuthor("Author3");
+        book.setIsbn("123456789(3)");
+        book.setPrice(BigDecimal.valueOf(97.99));
+        book.setDescription("Descr.3");
+        book.setCoverImage("Image3");
+        book.setCategories(Set.of(category));
+        return List.of(book);
     }
 }
