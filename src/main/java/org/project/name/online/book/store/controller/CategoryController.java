@@ -61,8 +61,10 @@ public class CategoryController {
     @PreAuthorize("hasRole('ROLE_ADMIN')")
     @Operation(summary = "Update a category by id",
             description = "This endpoint updates a category by id")
-    public CategoryDto updateCategory(@PathVariable @Min(1) Long id,
-                                      @RequestBody CreateCategoryRequestDto categoryDto) {
+    public CategoryDto updateCategory(
+            @PathVariable @Min(1) Long id,
+            @RequestBody @Valid CreateCategoryRequestDto categoryDto
+    ) {
         return categoryService.update(id, categoryDto);
     }
 
@@ -78,7 +80,9 @@ public class CategoryController {
     @GetMapping("/{id}/books")
     @Operation(summary = "Receive all books by category id",
             description = "This endpoint receives all books by category id")
-    public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(@PathVariable @Min(1) Long id) {
-        return bookService.findAllByCategoryId(id);
+    public List<BookDtoWithoutCategoryIds> getBooksByCategoryId(
+            @PathVariable @Min(1) Long id,
+            Pageable pageable) {
+        return bookService.findAllByCategoryId(id, pageable);
     }
 }

@@ -31,10 +31,7 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto save(CreateBookRequestDto bookDto) {
         checkIfIsbnIsDuplicate(bookDto.getIsbn());
-        List<Category> categories = bookDto.getCategoryIds().stream()
-                .map(id -> categoryRepository.findById(id).orElseThrow(
-                        () -> new EntityNotFoundException("There is no category by id: " + id)))
-                .toList();
+        List<Category> categories = getListOfCategories(bookDto.getCategoryIds());
         Book book = bookMapper.toModel(bookDto, categories);
         return bookMapper.toDto(bookRepository.save(book));
     }
@@ -56,13 +53,9 @@ public class BookServiceImpl implements BookService {
     @Override
     public BookDto updateBookById(Long id, UpdateBookRequestDto bookDto) {
         checkIfIsbnIsDuplicate(bookDto.getIsbn());
-        Book bookById = bookRepository.findById(id).orElseThrow(() -> new EntityNotFoundException(
-                "There is no book by id: " + id));
-        List<Category> categories = bookDto.getCategoryIds().stream()
-                .map(categoryId -> categoryRepository.findById(categoryId)
-                        .orElseThrow(() -> new EntityNotFoundException(
-                                "There is no category by id: " + categoryId)))
-                .toList();
+        Book bookById = bookRepository.findById(id).orElseThrow(
+                () -> new EntityNotFoundException("There is no book by id: " + id));
+        List<Category> categories = getListOfCategories(bookDto.getCategoryIds());
         Book book = bookMapper.mergeEntities(bookDto, bookById, categories);
         return bookMapper.toDto(bookRepository.save(book));
     }
@@ -76,8 +69,8 @@ public class BookServiceImpl implements BookService {
     }
 
     @Override
-    public List<BookDtoWithoutCategoryIds> findAllByCategoryId(Long id) {
-        return bookRepository.findAllByCategoryId(id).stream()
+    public List<BookDtoWithoutCategoryIds> findAllByCategoryId(Long id, Pageable pageable) {
+        return bookRepository.findAllByCategoryId(id, pageable).stream()
                 .map(bookMapper::toDtoWithoutCategories)
                 .toList();
     }
@@ -91,7 +84,16 @@ public class BookServiceImpl implements BookService {
 
     private void checkIfIsbnIsDuplicate(String isbn) {
         if (bookRepository.findByIsbn(isbn).isPresent()) {
-            throw new DuplicateException("This isbn is already registered in the data base");
+            throw new DuplicateException(
+                    "This isbn: " + isbn + ", is already registered in the data base");
         }
+    }
+
+    private List<Category> getListOfCategories(List<Long> bookCategories) {
+        return bookCategories.stream()
+                .map(categoryId -> categoryRepository.findById(categoryId).orElseThrow(
+                        () -> new EntityNotFoundException(
+                                "There is no category by id: " + categoryId)))
+                .toList();
     }
 }
