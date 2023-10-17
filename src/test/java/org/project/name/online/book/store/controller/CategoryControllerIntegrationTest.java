@@ -74,8 +74,8 @@ class CategoryControllerIntegrationTest {
             connection.setAutoCommit(true);
             ScriptUtils.executeSqlScript(
                     connection,
-                    new ClassPathResource("database/books/controller/"
-                            + "remove-everything-after-tests.sql")
+                    new ClassPathResource("database/categories/controller/"
+                            + "remove-categories-from-categories-table.sql")
             );
         }
     }
@@ -167,7 +167,7 @@ class CategoryControllerIntegrationTest {
             + "add-category-to-categories-table.sql",
             executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @DisplayName("Delete category by id")
-    void deleteCategory_ValidRequestDto_RespondStatusOk() throws Exception {
+    void deleteCategory_ValidRequestDto_RespondStatusNoContent() throws Exception {
         mockMvc.perform(delete("/categories/3"))
                 .andExpect(status().isNoContent());
 
