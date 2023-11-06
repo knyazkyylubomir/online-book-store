@@ -1,7 +1,7 @@
 # Online Book Store
 The project is a comprehensive API solution for a web store of books. It has all required endpoints such as adding a book to the shopping cart or finding a book by book id or category id, along with the authentication endpoints.
 
-![](https://www.loom.com/share/630ad52642ea436fae17a26dceb599df?sid=201abbaa-c895-49f2-8585-b6fe46d5250a)
+[Loom: Utilizing my project](https://www.loom.com/share/630ad52642ea436fae17a26dceb599df?sid=201abbaa-c895-49f2-8585-b6fe46d5250a)
 ## Technologies
 Technologies used in my project:
 * [Spring Boot](https://spring.io/projects/spring-boot)
