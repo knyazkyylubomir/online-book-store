@@ -66,8 +66,8 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}/items")
-    @Operation(summary = "Receive all order-items",
-            description = "This endpoint receives all order-items by an order id")
+    @Operation(summary = "Receive all items of an order",
+            description = "This endpoint receives all items of an order by order id")
     public List<OrderItemDto> getAllOrderItems(
             Authentication authentication,
             @PathVariable @Min(1) Long orderId,
@@ -78,7 +78,7 @@ public class OrderController {
     }
 
     @GetMapping("/{orderId}/items/{itemId}")
-    @Operation(summary = "Receive an order-item by the order",
+    @Operation(summary = "Receive an order-item by an order",
             description = "This endpoint receives an order-item by an order id")
     public OrderItemDto getItemByIdWithinOrder(
             Authentication authentication,
